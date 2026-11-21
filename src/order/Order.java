@@ -3,7 +3,8 @@ package order;
 import model.Waffle;
 import notification.OrderEvent;
 import notification.OrderObserver;
-import util.MoneyFormat;
+import payment.PaymentResult;
+import payment.PaymentStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,9 +12,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class Order {
-  private int id;
-  private List<OrderItem> items = new ArrayList<>();
-  private List<OrderObserver> observers = new ArrayList<>();
+  private final int id;
+  private final List<OrderItem> items = new ArrayList<>();
+  private final List<OrderObserver> observers = new ArrayList<>();
+// NEW = no waffles yet; CUSTOMIZING = has at least one waffle; PAID = closed.
   private OrderStatus status = OrderStatus.NEW;
   private String paymentMethod;
 
@@ -54,8 +56,7 @@ public class Order {
     ensureNotPaid();
     items.add(item);
     status = OrderStatus.CUSTOMIZING;
-    notifyObservers(OrderEvent.ITEM_ADDED,
-      "Added " + describe(item) + ". Order total: " + MoneyFormat.format(getTotal()) + ".");
+    notifyObservers(OrderEvent.ITEM_ADDED, "Added " + item.getWaffle().getDescription() + ".");
   }
 
   public void replaceWaffle(OrderItem item, Waffle newWaffle, OrderEvent event, String change) {
@@ -64,8 +65,27 @@ public class Order {
       throw new IllegalArgumentException("This item does not belong to order #" + id + ".");
     }
     item.setWaffle(newWaffle);
-    notifyObservers(event,
-      change + " Your waffle: " + describe(item) + ". Order total: " + MoneyFormat.format(getTotal()) + ".");
+    notifyObservers(event, change + ". Your waffle: " + newWaffle.getDescription() + ".");
+  }
+
+  public boolean checkout(PaymentStrategy strategy) {
+    ensureNotPaid();
+    Objects.requireNonNull(strategy, "strategy must not be null");
+    if (items.isEmpty()) {
+      return false;
+    }
+
+    PaymentResult result = strategy.pay(getTotal());
+    Objects.requireNonNull(result, "payment result must not be null");
+
+    if (result.isSuccess()) {
+      status = OrderStatus.PAID;
+      paymentMethod = strategy.getName();
+      notifyObservers(OrderEvent.PAID, result.getMessage());
+    } else {
+      notifyObservers(OrderEvent.PAYMENT_FAILED, result.getMessage());
+    }
+    return result.isSuccess();
   }
 
   public void addObserver(OrderObserver observer) {
@@ -88,10 +108,5 @@ public class Order {
     if (isPaid()) {
       throw new IllegalStateException("Order #" + id + " has already been paid.");
     }
-  }
-
-  private static String describe(OrderItem item) {
-    Waffle waffle = item.getWaffle();
-    return waffle.getDescription() + " (" + MoneyFormat.format(waffle.getPrice()) + ")";
   }
 }
