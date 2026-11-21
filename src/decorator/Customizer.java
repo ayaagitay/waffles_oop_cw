@@ -14,7 +14,7 @@ public final class Customizer {
 
     /**
      * Adds a customization and returns the new waffle.
-     * The old waffle stays the same, so undo can just go back to it.
+     * Toppings can be added more than once (shown as x2, x3).
      * Throws IncompatibleCustomizationException if a sauce is already added.
      */
     public static Waffle apply(Waffle waffle, Customization c)
