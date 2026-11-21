@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import util.MoneyFormat;
 
 public abstract class Waffle {
     public abstract String getDescription();
@@ -8,7 +9,7 @@ public abstract class Waffle {
     public abstract List<Customization> getCustomizations();
 
     public String getFormattedPrice() {
-        return String.format("%,d UZS", getPrice());
+        return MoneyFormat.format(getPrice());
     }
 
     public String toString() {
