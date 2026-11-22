@@ -25,6 +25,11 @@ public class InputReader {
     }
   }
 
+  public String readText(String prompt) {
+    System.out.print(prompt);
+    return scanner.nextLine().trim();
+  }
+
   public boolean readYesNo(String prompt) {
     while (true) {
       System.out.print(prompt);
