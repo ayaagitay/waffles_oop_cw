@@ -1,6 +1,7 @@
 package order;
 
 import model.Waffle;
+import command.CommandHistory;
 import notification.OrderEvent;
 import notification.OrderObserver;
 import payment.PaymentResult;
@@ -18,6 +19,7 @@ public class Order {
 // NEW = no waffles yet; CUSTOMIZING = has at least one waffle; PAID = closed.
   private OrderStatus status = OrderStatus.NEW;
   private String paymentMethod;
+  private final CommandHistory history = new CommandHistory();
 
   Order(int id) {
     this.id = id;
@@ -37,6 +39,10 @@ public class Order {
 
   public String getPaymentMethod() {
     return paymentMethod;
+  }
+
+  public CommandHistory getHistory() {
+    return history;
   }
 
   public List<OrderItem> getItems() {
