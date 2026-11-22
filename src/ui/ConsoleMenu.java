@@ -29,7 +29,7 @@ public class ConsoleMenu {
 
   public void start() {
     System.out.println("===================================");
-    System.out.println("    Welcome to the Waffle Universe!");
+    System.out.println("  Welcome to the Waffle Universe!");
     System.out.println("===================================");
 
     boolean running = true;
@@ -72,12 +72,11 @@ public class ConsoleMenu {
   // ------------------------------------------------------------ menu
 
   private void printMenu() {
-    System.out.println();
+    System.out.println("=== MAIN MENU ===");
     if (currentOrder == null) {
-      System.out.println("=== MAIN MENU === (no order selected)");
+      System.out.println("No order selected");
     } else {
-      System.out.println("=== MAIN MENU === Current: Order #" + currentOrder.getId()
-          + " | " + currentOrder.getItems().size() + " waffle(s)" + " | Total: " + MoneyFormat.format(currentOrder.getTotal()));
+      System.out.println("Current: Order #" + currentOrder.getId() + " | " + currentOrder.getItems().size() + " waffle(s)" + " | Total: " + MoneyFormat.format(currentOrder.getTotal()));
     }
     System.out.println("1. Start a new order");
     System.out.println("2. Switch to another order");
